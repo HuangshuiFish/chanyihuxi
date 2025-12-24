@@ -2,9 +2,6 @@
 
 // DOM 元素获取
 const appContainer = document.getElementById('appContainer');
-const breathingCircle = document.getElementById('breathingCircle');
-const breathingText = document.getElementById('breathingText');
-const breathingControlBtn = document.getElementById('breathingControlBtn');
 const contractionBtn = document.getElementById('contractionBtn');
 const contractionBtnText = document.getElementById('contractionBtnText');
 const contractionStatus = document.getElementById('contractionStatus');
@@ -22,17 +19,11 @@ let appState = {
     isRecording: false,          // 是否正在记录宫缩
     lastContractionStart: null,  // 上一次宫缩开始时间
     contractionHistory: [],      // 宫缩历史记录
-    isBreathingActive: false,    // 呼吸引导是否激活
-    breathingTimer: null,        // 呼吸引导定时器
     warningLevel: 0              // 预警等级：0-正常，1-黄色提醒，2-红色警报
 };
 
 // 常量定义
 const STORAGE_KEY = 'zen_breathing_contractions';
-const BREATHING_CYCLE = 10000;     // 呼吸周期：10秒
-const INHALE_DURATION = 4000;      // 吸气时长：4秒
-const EXHALE_DURATION = 6000;      // 呼气时长：6秒
-const BREATHING_DELAY = 5000;       // 宫缩开始后呼吸引导延迟：5秒
 const WARNING_511_THRESHOLD = 6;   // 5-1-1标准判定的宫缩次数阈值：6次
 const WARNING_511_INTERVAL = 5 * 60 * 1000;  // 5-1-1标准：间隔≤5分钟
 const WARNING_511_DURATION = 60 * 1000;       // 5-1-1标准：持续≥1分钟
@@ -76,9 +67,6 @@ function saveHistoryData() {
 
 // 初始化事件监听
 function initEventListeners() {
-    // 呼吸引导控制按钮
-    breathingControlBtn.addEventListener('click', toggleBreathingGuide);
-    
     // 宫缩记录按钮
     contractionBtn.addEventListener('click', toggleContractionRecording);
     
@@ -127,13 +115,6 @@ function startContraction() {
     contractionBtn.classList.add('active');
     contractionBtnText.textContent = '不疼了点一下';
     contractionStatus.textContent = '正在记录宫缩...';
-    
-    // 5秒后自动启动呼吸引导
-    setTimeout(() => {
-        if (appState.isRecording && !appState.isBreathingActive) {
-            startBreathingGuide();
-        }
-    }, BREATHING_DELAY);
 }
 
 // 结束记录宫缩
@@ -171,59 +152,6 @@ function endContraction() {
     
     // 检查是否需要显示预警
     checkWarningLevel();
-}
-
-// 呼吸引导功能
-function toggleBreathingGuide() {
-    if (appState.isBreathingActive) {
-        stopBreathingGuide();
-    } else {
-        startBreathingGuide();
-    }
-}
-
-// 开始呼吸引导
-function startBreathingGuide() {
-    appState.isBreathingActive = true;
-    breathingControlBtn.textContent = '停止呼吸引导';
-    breathingControlBtn.classList.add('active');
-    
-    // 启动呼吸动画
-    startBreathingAnimation();
-}
-
-// 停止呼吸引导
-function stopBreathingGuide() {
-    appState.isBreathingActive = false;
-    breathingControlBtn.textContent = '开始呼吸引导';
-    breathingControlBtn.classList.remove('active');
-    breathingText.textContent = '准备';
-    
-    // 停止呼吸动画
-    if (appState.breathingTimer) {
-        clearInterval(appState.breathingTimer);
-        appState.breathingTimer = null;
-    }
-}
-
-// 启动呼吸动画
-function startBreathingAnimation() {
-    // 立即执行一次，然后开始循环
-    updateBreathingState();
-    
-    // 设置定时器，每10秒更新一次呼吸状态
-    appState.breathingTimer = setInterval(updateBreathingState, BREATHING_CYCLE);
-}
-
-// 更新呼吸状态
-function updateBreathingState() {
-    // 吸气阶段
-    breathingText.textContent = '吸气';
-    
-    // 4秒后切换到呼气阶段
-    setTimeout(() => {
-        breathingText.textContent = '呼气';
-    }, INHALE_DURATION);
 }
 
 // 智能分析与提醒功能
