@@ -110,96 +110,19 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     padding: 20px;
-    gap: 30px;
+    gap: 40px;
+    overflow-y: auto;
 }
 
-/* 呼吸引导区域 */
-.breathing-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    width: 100%;
-    max-width: 400px;
-}
-
-.breathing-circle-container {
-    width: 100%;
-    aspect-ratio: 1;
-    max-width: 300px;
-    max-height: 300px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.breathing-circle {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary-light), var(--secondary-color));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: var(--shadow-md);
-    transition: all var(--transition-slow);
-    animation: breathing 10s infinite ease-in-out;
-    opacity: 0.8;
-}
-
-/* 呼吸引导动画 */
-@keyframes breathing {
-    0% {
-        transform: scale(1);
-        opacity: 0.8;
+/* 响应式调整：确保在小屏幕上内容可以滚动 */
+@media (max-width: 480px) {
+    .main-content {
+        padding: 15px;
+        gap: 30px;
+        min-height: calc(100vh - 100px);
     }
-    40% {
-        transform: scale(1.5);
-        opacity: 1;
-    }
-    100% {
-        transform: scale(1);
-        opacity: 0.8;
-    }
-}
-
-.breathing-text {
-    font-size: 24px;
-    font-weight: 600;
-    color: var(--text-light);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    transition: all var(--transition-normal);
-}
-
-.breathing-control-btn {
-    padding: 12px 24px;
-    font-size: 16px;
-    font-weight: 500;
-    color: var(--text-light);
-    background-color: var(--primary-color);
-    border: none;
-    border-radius: 25px;
-    cursor: pointer;
-    box-shadow: var(--shadow-sm);
-    transition: all var(--transition-fast);
-    min-width: 180px;
-}
-
-.breathing-control-btn:hover {
-    background-color: var(--primary-dark);
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
-}
-
-.breathing-control-btn:active {
-    transform: translateY(0);
-    box-shadow: var(--shadow-sm);
-}
-
-.breathing-control-btn.active {
-    background-color: var(--accent-color);
 }
 
 /* 宫缩记录区域 */
@@ -573,20 +496,6 @@ body {
         font-size: 14px;
     }
     
-    .main-content {
-        padding: 15px;
-        gap: 20px;
-    }
-    
-    .breathing-circle {
-        width: 120px;
-        height: 120px;
-    }
-    
-    .breathing-text {
-        font-size: 18px;
-    }
-    
     .contraction-btn {
         width: 180px;
         height: 180px;
@@ -609,6 +518,12 @@ body {
     .modal-content {
         width: 95%;
         margin: 20px;
+        max-height: 90vh;
+    }
+    
+    .modal-body {
+        max-height: 60vh;
+        overflow-y: auto;
     }
     
     .modal-header, .modal-body, .modal-footer {
