@@ -1,0 +1,638 @@
+/* 基础样式重置 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* CSS变量定义 - 主题颜色 */
+:root {
+    /* 主色调 */
+    --primary-color: #4ecdc4;
+    --primary-light: #88d8d0;
+    --primary-dark: #26a69a;
+    
+    /* 辅助色 */
+    --secondary-color: #45b7d1;
+    --accent-color: #f9a825;
+    --danger-color: #ef5350;
+    
+    /* 文本颜色 */
+    --text-primary: #263238;
+    --text-secondary: #607d8b;
+    --text-light: #ffffff;
+    
+    /* 背景颜色 */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f5;
+    --bg-dark: #263238;
+    
+    /* 边框颜色 */
+    --border-color: #e0e0e0;
+    
+    /* 阴影 */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+    
+    /* 过渡效果 */
+    --transition-fast: 0.3s ease;
+    --transition-normal: 0.5s ease;
+    --transition-slow: 1s ease;
+}
+
+/* 深色模式 */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-primary: #263238;
+        --bg-secondary: #37474f;
+        --text-primary: #ffffff;
+        --text-secondary: #b0bec5;
+        --border-color: #455a64;
+    }
+}
+
+/* 基础样式 */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+    transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+/* 应用容器 */
+.app-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: all var(--transition-normal);
+}
+
+/* 预警状态样式 */
+.app-container.warning-level-1 {
+    border: 4px solid var(--accent-color);
+}
+
+.app-container.warning-level-2 {
+    background-color: var(--danger-color) !important;
+    color: var(--text-light) !important;
+}
+
+/* 顶部区域 */
+.app-header {
+    text-align: center;
+    padding: 20px 16px;
+    background-color: var(--bg-secondary);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-normal);
+}
+
+.app-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 4px;
+}
+
+.app-subtitle {
+    font-size: 16px;
+    color: var(--text-secondary);
+    font-weight: 400;
+}
+
+/* 主要内容区域 */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    gap: 30px;
+}
+
+/* 呼吸引导区域 */
+.breathing-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.breathing-circle-container {
+    width: 100%;
+    aspect-ratio: 1;
+    max-width: 300px;
+    max-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.breathing-circle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-light), var(--secondary-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-slow);
+    animation: breathing 10s infinite ease-in-out;
+    opacity: 0.8;
+}
+
+/* 呼吸引导动画 */
+@keyframes breathing {
+    0% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    40% {
+        transform: scale(1.5);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+}
+
+.breathing-text {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-light);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all var(--transition-normal);
+}
+
+.breathing-control-btn {
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-light);
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-fast);
+    min-width: 180px;
+}
+
+.breathing-control-btn:hover {
+    background-color: var(--primary-dark);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.breathing-control-btn:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
+.breathing-control-btn.active {
+    background-color: var(--accent-color);
+}
+
+/* 宫缩记录区域 */
+.contraction-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.contraction-btn {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    border: none;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
+    user-select: none;
+}
+
+.contraction-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+.contraction-btn:active {
+    transform: scale(0.95);
+}
+
+.contraction-btn.active {
+    background: linear-gradient(135deg, var(--danger-color), #d32f2f);
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(239, 83, 80, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 15px rgba(239, 83, 80, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(239, 83, 80, 0);
+    }
+}
+
+.contraction-btn-text {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-light);
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    line-height: 1.3;
+}
+
+.contraction-status {
+    font-size: 16px;
+    color: var(--text-secondary);
+    text-align: center;
+    min-height: 20px;
+}
+
+/* 功能按钮区域 */
+.function-buttons {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    max-width: 400px;
+}
+
+.function-btn {
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-primary);
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 25px;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-fast);
+    min-width: 120px;
+}
+
+.function-btn:hover {
+    background-color: var(--border-color);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.function-btn:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
+/* 模态框样式 */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    backdrop-filter: blur(2px);
+}
+
+.modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: var(--bg-primary);
+    border-radius: 16px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    animation: modalSlideIn 0.3s ease;
+    transition: all var(--transition-normal);
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all var(--transition-fast);
+}
+
+.close-btn:hover {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.modal-body {
+    padding: 20px;
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+/* 历史记录样式 */
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.history-item {
+    background-color: var(--bg-secondary);
+    padding: 16px;
+    border-radius: 12px;
+    border-left: 4px solid var(--primary-color);
+    transition: all var(--transition-fast);
+}
+
+.history-item:hover {
+    box-shadow: var(--shadow-sm);
+    transform: translateX(4px);
+}
+
+.history-item-time {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.history-item-details {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+    color: var(--text-primary);
+}
+
+.history-item-duration, .history-item-interval {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.history-item-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.history-item-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.no-history {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 40px 20px;
+    font-size: 16px;
+}
+
+/* 清空记录按钮 */
+.clear-btn {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--danger-color);
+    background-color: transparent;
+    border: 1px solid var(--danger-color);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.clear-btn:hover {
+    background-color: var(--danger-color);
+    color: var(--text-light);
+}
+
+/* 警报模态框样式 */
+.alert-modal {
+    max-width: 400px;
+}
+
+.alert-header {
+    background-color: var(--danger-color);
+    color: var(--text-light);
+    border: none;
+}
+
+.alert-header h2 {
+    color: var(--text-light);
+}
+
+.alert-body {
+    text-align: center;
+    padding: 30px 20px;
+}
+
+.alert-text {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--danger-color);
+    margin-bottom: 16px;
+    line-height: 1.2;
+}
+
+.alert-subtext {
+    font-size: 16px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.alert-footer {
+    justify-content: center;
+    gap: 20px;
+}
+
+.cancel-btn, .confirm-btn {
+    padding: 12px 30px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    min-width: 120px;
+}
+
+.cancel-btn {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.cancel-btn:hover {
+    background-color: var(--border-color);
+}
+
+.confirm-btn {
+    background-color: var(--danger-color);
+    color: var(--text-light);
+}
+
+.confirm-btn:hover {
+    background-color: #d32f2f;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+/* 响应式设计 */
+@media (max-width: 480px) {
+    .app-title {
+        font-size: 24px;
+    }
+    
+    .app-subtitle {
+        font-size: 14px;
+    }
+    
+    .main-content {
+        padding: 15px;
+        gap: 20px;
+    }
+    
+    .breathing-circle {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .breathing-text {
+        font-size: 18px;
+    }
+    
+    .contraction-btn {
+        width: 180px;
+        height: 180px;
+    }
+    
+    .contraction-btn-text {
+        font-size: 18px;
+    }
+    
+    .function-buttons {
+        gap: 12px;
+    }
+    
+    .function-btn {
+        padding: 10px 20px;
+        font-size: 14px;
+        min-width: 100px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 20px;
+    }
+    
+    .modal-header, .modal-body, .modal-footer {
+        padding: 16px;
+    }
+    
+    .alert-text {
+        font-size: 24px;
+    }
+}
+
+/* 辅助类 */
+.hidden {
+    display: none !important;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mt-10 {
+    margin-top: 10px;
+}
+
+.mb-10 {
+    margin-bottom: 10px;
+}
