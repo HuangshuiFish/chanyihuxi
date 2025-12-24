@@ -1,0 +1,95 @@
+<!--
+ * @Author: tangjian tangjian6@sgepri.sgcc.com.cn
+ * @Date: 2025-12-22 21:43:45
+ * @LastEditors: tangjian tangjian6@sgepri.sgcc.com.cn
+ * @LastEditTime: 2025-12-22 21:43:53
+ * @Description: 
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="禅意呼吸 - 宫缩伴侣应用，为孕妇提供宫缩记录、呼吸引导和就医提醒一体化解决方案">
+    <title>禅意呼吸 - 宫缩伴侣</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- 应用容器 -->
+    <div class="app-container" id="appContainer">
+        
+        <!-- 顶部区域 -->
+        <header class="app-header">
+            <h1 class="app-title">禅意呼吸</h1>
+            <p class="app-subtitle">宫缩伴侣</p>
+        </header>
+        
+        <!-- 主要内容区域 -->
+        <main class="main-content">
+            
+            <!-- 呼吸引导区域 -->
+            <section class="breathing-section">
+                <div class="breathing-circle-container">
+                    <div class="breathing-circle" id="breathingCircle">
+                        <span class="breathing-text" id="breathingText">准备</span>
+                    </div>
+                </div>
+                <button class="breathing-control-btn" id="breathingControlBtn">开始呼吸引导</button>
+            </section>
+            
+            <!-- 宫缩记录区域 -->
+            <section class="contraction-section">
+                <button class="contraction-btn" id="contractionBtn">
+                    <span class="contraction-btn-text" id="contractionBtnText">疼了点一下</span>
+                </button>
+                <div class="contraction-status" id="contractionStatus"></div>
+            </section>
+            
+            <!-- 功能按钮区域 -->
+            <section class="function-buttons">
+                <button class="function-btn" id="historyBtn">历史记录</button>
+            </section>
+            
+        </main>
+        
+        <!-- 历史记录模态框 -->
+        <div class="modal" id="historyModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>宫缩历史记录</h2>
+                    <button class="close-btn" id="closeHistoryModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="history-list" id="historyList">
+                        <!-- 历史记录将通过JavaScript动态添加 -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="clear-btn" id="clearHistoryBtn">清空记录</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 医院提醒模态框 -->
+        <div class="modal" id="hospitalModal">
+            <div class="modal-content alert-modal">
+                <div class="modal-header alert-header">
+                    <h2>⚠️ 就医提醒</h2>
+                </div>
+                <div class="modal-body alert-body">
+                    <p class="alert-text">拿上待产包，去医院！</p>
+                    <p class="alert-subtext">您的宫缩已达到5-1-1标准，建议立即就医。</p>
+                </div>
+                <div class="modal-footer alert-footer">
+                    <button class="cancel-btn" id="cancelHospitalBtn">取消</button>
+                    <button class="confirm-btn" id="confirmHospitalBtn">确认</button>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <!-- 引入JavaScript文件 -->
+    <script src="script.js"></script>
+</body>
+</html>
