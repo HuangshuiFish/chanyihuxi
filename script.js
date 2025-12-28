@@ -316,16 +316,40 @@ function formatDateTime(timestamp) {
     });
 }
 
-// 工具函数：格式化时长（毫秒转分秒）
+// 工具函数：格式化时长（毫秒转人性化时间显示）
 function formatDuration(milliseconds) {
-    const seconds = Math.floor(milliseconds / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    const totalMinutes = Math.floor(totalSeconds / 60);
+    const totalHours = Math.floor(totalMinutes / 60);
+    const totalDays = Math.floor(totalHours / 24);
     
-    if (minutes > 0) {
-        return `${minutes}分${remainingSeconds}秒`;
+    const seconds = totalSeconds % 60;
+    const minutes = totalMinutes % 60;
+    const hours = totalHours % 24;
+    
+    // 大于等于1天：显示"X天Y小时"
+    if (totalDays >= 1) {
+        if (hours > 0) {
+            return `${totalDays}天${hours}小时`;
+        } else {
+            return `${totalDays}天`;
+        }
+    }
+    
+    // 大于等于1小时：显示"X小时Y分钟"
+    if (totalHours >= 1) {
+        if (minutes > 0) {
+            return `${totalHours}小时${minutes}分钟`;
+        } else {
+            return `${totalHours}小时`;
+        }
+    }
+    
+    // 小于1小时：显示"X分Y秒"
+    if (totalMinutes > 0) {
+        return `${totalMinutes}分${seconds}秒`;
     } else {
-        return `${remainingSeconds}秒`;
+        return `${seconds}秒`;
     }
 }
 
