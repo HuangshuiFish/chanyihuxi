@@ -112,16 +112,16 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding: 20px;
-    gap: 40px;
+    padding: 30px 20px;
+    gap: 50px;
     overflow-y: auto;
 }
 
 /* 响应式调整：确保在小屏幕上内容可以滚动 */
 @media (max-width: 480px) {
     .main-content {
-        padding: 15px;
-        gap: 30px;
+        padding: 25px 15px;
+        gap: 40px;
         min-height: calc(100vh - 100px);
     }
 }
@@ -146,10 +146,13 @@ body {
     box-shadow: var(--shadow-lg);
     transition: all var(--transition-fast);
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     touch-action: manipulation;
     user-select: none;
+    position: relative;
+    padding: 20px;
 }
 
 .contraction-btn:hover {
@@ -178,6 +181,40 @@ body {
     }
 }
 
+/* 呼吸辅助动画样式 */
+.contraction-btn.breathing {
+    animation: none; /* 移除原有pulse动画 */
+    transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1),
+                background 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.contraction-btn.breathing.inhale {
+    transform: scale(1.15);
+    background: linear-gradient(135deg, #81c784, #4caf50);
+    box-shadow: 0 0 30px rgba(76, 175, 80, 0.4);
+    transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1),
+                background 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.contraction-btn.breathing.exhale {
+    transform: scale(0.85);
+    background: linear-gradient(135deg, #64b5f6, #2196f3);
+    box-shadow: 0 0 20px rgba(33, 150, 243, 0.3);
+    transition: transform 6s cubic-bezier(0.4, 0, 0.2, 1),
+                background 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 海浪效果动画 */
+@keyframes breathingWave {
+    0% { transform: scale(0.85); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(0.85); }
+}
+
+.contraction-btn.breathing.wave-mode {
+    animation: breathingWave var(--breathing-cycle-time) cubic-bezier(0.37, 0, 0.63, 1) infinite;
+}
+
 .contraction-btn-text {
     font-size: 20px;
     font-weight: 600;
@@ -185,6 +222,46 @@ body {
     text-align: center;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     line-height: 1.3;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+.breathing-instruction {
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-light);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 3;
+    width: 80%;
+    text-align: center;
+}
+
+.breathing-instruction.show {
+    opacity: 1;
+}
+
+.breathing-counter {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-light);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    display: none;
+    pointer-events: none;
+    z-index: 3;
 }
 
 .contraction-status {
@@ -507,12 +584,24 @@ body {
         width: 180px;
         height: 180px;
         max-width: calc(100% - 40px);
+        padding: 15px;
     }
     
     .contraction-btn-text {
-        font-size: 18px;
-        padding: 0 20px;
+        font-size: 16px;
+        padding: 0 10px;
         line-height: 1.2;
+    }
+    
+    .breathing-instruction {
+        top: 20px;
+        font-size: 10px;
+        width: 70%;
+    }
+    
+    .breathing-counter {
+        bottom: 20px;
+        font-size: 16px;
     }
     
     .contraction-status {
@@ -596,3 +685,75 @@ body {
 .mb-10 {
     margin-bottom: 10px;
 }
+
+/* 呼吸设置模态框样式 */
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.setting-item:last-child {
+    border-bottom: none;
+}
+
+.setting-item label {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.setting-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.time-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.time-btn {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 600;
+    transition: all var(--transition-fast);
+}
+
+.time-btn:hover {
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    border-color: var(--primary-color);
+}
+
+.time-btn:active {
+    transform: scale(0.95);
+}
+
+.time-display {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--primary-color);
+    min-width: 20px;
+    text-align: center;
+}
+
+.time-unit {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.setting-description 
