@@ -19,7 +19,18 @@ let appState = {
     isRecording: false,          // 是否正在记录宫缩
     lastContractionStart: null,  // 上一次宫缩开始时间
     contractionHistory: [],      // 宫缩历史记录
-    warningLevel: 0              // 预警等级：0-正常，1-黄色提醒，2-红色警报
+    warningLevel: 0,             // 预警等级：0-正常，1-黄色提醒，2-红色警报
+    // 新增呼吸相关状态
+    isBreathing: false,          // 是否正在进行呼吸引导
+    breathingPhase: 'inhale',    // 当前呼吸阶段：'inhale' | 'exhale'
+    breathingCycle: 0,           // 当前呼吸周期计数
+    breathingTimer: null,        // 呼吸总计时器
+    phaseTimer: null,            // 呼吸阶段计时器
+    breathingSettings: {         // 呼吸设置
+        inhaleTime: 4000,        // 吸气时长（毫秒）
+        exhaleTime: 6000,        // 呼气时长（毫秒）
+        enabled: true            // 是否启用呼吸辅助
+    }
 };
 
 // 常量定义
@@ -28,10 +39,19 @@ const WARNING_511_THRESHOLD = 6;   // 5-1-1标准判定的宫缩次数阈值：6
 const WARNING_511_INTERVAL = 5 * 60 * 1000;  // 5-1-1标准：间隔≤5分钟
 const WARNING_511_DURATION = 60 * 1000;       // 5-1-1标准：持续≥1分钟
 
+// 呼吸辅助相关常量
+const BREATHING_INHALE_TIME = 4000;      // 吸气时长：4秒
+const BREATHING_EXHALE_TIME_SHORT = 6000; // 短呼气时长：6秒
+const BREATHING_EXHALE_TIME_LONG = 8000;  // 长呼气时长：8秒
+const BREATHING_TRANSITION_TIME = 500;    // 呼吸阶段过渡时间
+
 // 初始化应用
 function initApp() {
     // 从本地存储加载历史数据
     loadHistoryData();
+    
+    // 加载呼吸设置
+    loadBreathingSettings();
     
     // 初始化事件监听
     initEventListeners();
@@ -79,10 +99,25 @@ function initEventListeners() {
     cancelHospitalBtn.addEventListener('click', closeHospitalModal);
     confirmHospitalBtn.addEventListener('click', confirmHospital);
     
+    // 呼吸设置按钮
+    document.getElementById('breathingSettingsBtn').addEventListener('click', openBreathingSettingsModal);
+    document.getElementById('closeBreathingSettingsModal').addEventListener('click', closeBreathingSettingsModal);
+    document.getElementById('saveBreathingSettings').addEventListener('click', saveBreathingSettings);
+    document.getElementById('resetBreathingSettings').addEventListener('click', resetBreathingSettings);
+    
+    // 呼吸时间调节按钮
+    document.getElementById('inhaleDecrease').addEventListener('click', () => adjustBreathingTime('inhale', -1));
+    document.getElementById('inhaleIncrease').addEventListener('click', () => adjustBreathingTime('inhale', 1));
+    document.getElementById('exhaleDecrease').addEventListener('click', () => adjustBreathingTime('exhale', -1));
+    document.getElementById('exhaleIncrease').addEventListener('click', () => adjustBreathingTime('exhale', 1));
+    
     // 点击模态框外部关闭模态框
     window.addEventListener('click', (e) => {
         if (e.target === historyModal) {
             closeHistoryModalHandler();
+        }
+        if (e.target === document.getElementById('breathingSettingsModal')) {
+            closeBreathingSettingsModal();
         }
     });
     
@@ -91,6 +126,7 @@ function initEventListeners() {
         if (e.key === 'Escape') {
             closeHistoryModalHandler();
             closeHospitalModal();
+            closeBreathingSettingsModal();
         }
     });
 }
@@ -115,6 +151,13 @@ function startContraction() {
     contractionBtn.classList.add('active');
     contractionBtnText.textContent = '不疼了点一下';
     contractionStatus.textContent = '正在记录宫缩...';
+    
+    // 启动呼吸引导
+    if (appState.breathingSettings.enabled) {
+        setTimeout(() => {
+            startBreathingGuide();
+        }, 1000); // 延迟1秒启动，让用户适应
+    }
 }
 
 // 结束记录宫缩
@@ -122,6 +165,9 @@ function endContraction() {
     appState.isRecording = false;
     const endTime = Date.now();
     const duration = endTime - appState.lastContractionStart;
+    
+    // 停止呼吸引导
+    stopBreathingGuide();
     
     // 计算间隔时间（与上一次宫缩的间隔）
     const lastContraction = appState.contractionHistory[appState.contractionHistory.length - 1];
@@ -355,3 +401,227 @@ function formatDuration(milliseconds) {
 
 // 初始化应用
 initApp();
+
+// 呼吸辅助功能实现
+
+// 开始呼吸引导
+function startBreathingGuide() {
+    if (!appState.breathingSettings.enabled || appState.isBreathing) {
+        return;
+    }
+    
+    appState.isBreathing = true;
+    appState.breathingCycle = 0;
+    appState.breathingPhase = 'inhale';
+    
+    // 添加呼吸样式类
+    contractionBtn.classList.add('breathing');
+    
+    // 显示呼吸引导元素
+    document.getElementById('breathingInstruction').classList.add('show');
+    document.getElementById('breathingCounter').style.display = 'block';
+    
+    // 开始第一个呼吸周期
+    startBreathingCycle();
+}
+
+// 停止呼吸引导
+function stopBreathingGuide() {
+    if (!appState.isBreathing) {
+        return;
+    }
+    
+    appState.isBreathing = false;
+    
+    // 清理计时器
+    if (appState.breathingTimer) {
+        clearTimeout(appState.breathingTimer);
+        appState.breathingTimer = null;
+    }
+    if (appState.phaseTimer) {
+        clearTimeout(appState.phaseTimer);
+        appState.phaseTimer = null;
+    }
+    
+    // 移除呼吸样式类
+    contractionBtn.classList.remove('breathing', 'inhale', 'exhale');
+    
+    // 隐藏呼吸引导元素
+    document.getElementById('breathingInstruction').classList.remove('show');
+    document.getElementById('breathingCounter').style.display = 'none';
+}
+
+// 开始呼吸周期
+function startBreathingCycle() {
+    if (!appState.isBreathing) return;
+    
+    // 开始吸气阶段
+    startInhalePhase();
+}
+
+// 吸气阶段
+function startInhalePhase() {
+    appState.breathingPhase = 'inhale';
+    contractionBtn.classList.remove('exhale');
+    contractionBtn.classList.add('inhale');
+    
+    document.getElementById('breathingInstruction').textContent = '深吸气';
+    
+    const inhaleSeconds = appState.breathingSettings.inhaleTime / 1000;
+    
+    // 倒计时显示 - 从设定秒数开始倒数到1
+    let countdown = inhaleSeconds;
+    document.getElementById('breathingCounter').textContent = countdown;
+    
+    const countdownInterval = setInterval(() => {
+        countdown--;
+        if (countdown > 0) {
+            document.getElementById('breathingCounter').textContent = countdown;
+        } else {
+            document.getElementById('breathingCounter').textContent = '0';
+            clearInterval(countdownInterval);
+        }
+    }, 1000);
+    
+    // 根据设定时间切换到呼气阶段
+    appState.phaseTimer = setTimeout(() => {
+        if (appState.isBreathing) {
+            startExhalePhase();
+        }
+    }, appState.breathingSettings.inhaleTime);
+}
+
+// 呼气阶段
+function startExhalePhase() {
+    appState.breathingPhase = 'exhale';
+    contractionBtn.classList.remove('inhale');
+    contractionBtn.classList.add('exhale');
+    
+    document.getElementById('breathingInstruction').textContent = '慢呼气';
+    
+    const exhaleTime = appState.breathingSettings.exhaleTime;
+    const countdownSeconds = exhaleTime / 1000;
+    
+    // 倒计时显示 - 从设定秒数开始倒数到1
+    let countdown = countdownSeconds;
+    document.getElementById('breathingCounter').textContent = countdown;
+    
+    const countdownInterval = setInterval(() => {
+        countdown--;
+        if (countdown > 0) {
+            document.getElementById('breathingCounter').textContent = countdown;
+        } else {
+            document.getElementById('breathingCounter').textContent = '0';
+            clearInterval(countdownInterval);
+        }
+    }, 1000);
+    
+    // 呼气时间结束后开始下一个周期
+    appState.phaseTimer = setTimeout(() => {
+        if (appState.isBreathing) {
+            appState.breathingCycle++;
+            startBreathingCycle();
+        }
+    }, exhaleTime);
+}
+
+// 呼吸设置功能
+
+// 打开呼吸设置模态框
+function openBreathingSettingsModal() {
+    document.getElementById('breathingSettingsModal').classList.add('show');
+    // 加载当前设置
+    document.getElementById('breathingEnabled').checked = appState.breathingSettings.enabled;
+    document.getElementById('inhaleTime').textContent = appState.breathingSettings.inhaleTime / 1000;
+    document.getElementById('exhaleTime').textContent = appState.breathingSettings.exhaleTime / 1000;
+}
+
+// 关闭呼吸设置模态框
+function closeBreathingSettingsModal() {
+    document.getElementById('breathingSettingsModal').classList.remove('show');
+}
+
+// 调节呼吸时间
+function adjustBreathingTime(type, delta) {
+    const minTime = 2; // 最小2秒
+    const maxTime = type === 'inhale' ? 8 : 12; // 吸气最大8秒，呼气最大12秒
+    
+    let currentTime;
+    if (type === 'inhale') {
+        currentTime = appState.breathingSettings.inhaleTime / 1000;
+        currentTime = Math.max(minTime, Math.min(maxTime, currentTime + delta));
+        appState.breathingSettings.inhaleTime = currentTime * 1000;
+        document.getElementById('inhaleTime').textContent = currentTime;
+    } else {
+        currentTime = appState.breathingSettings.exhaleTime / 1000;
+        currentTime = Math.max(minTime, Math.min(maxTime, currentTime + delta));
+        appState.breathingSettings.exhaleTime = currentTime * 1000;
+        document.getElementById('exhaleTime').textContent = currentTime;
+    }
+    
+    // 更新CSS动画时间
+    updateBreathingAnimationTiming();
+}
+
+// 更新呼吸动画时间
+function updateBreathingAnimationTiming() {
+    const inhaleSeconds = appState.breathingSettings.inhaleTime / 1000;
+    const exhaleSeconds = appState.breathingSettings.exhaleTime / 1000;
+    
+    // 动态更新CSS变量
+    document.documentElement.style.setProperty('--inhale-time', `${inhaleSeconds}s`);
+    document.documentElement.style.setProperty('--exhale-time', `${exhaleSeconds}s`);
+}
+
+// 重置呼吸设置
+function resetBreathingSettings() {
+    appState.breathingSettings.inhaleTime = 4000;
+    appState.breathingSettings.exhaleTime = 6000;
+    appState.breathingSettings.enabled = true;
+    
+    // 更新UI显示
+    document.getElementById('breathingEnabled').checked = true;
+    document.getElementById('inhaleTime').textContent = '4';
+    document.getElementById('exhaleTime').textContent = '6';
+    
+    // 更新动画时间
+    updateBreathingAnimationTiming();
+    
+    alert('已恢复默认设置（吸气4秒，呼气6秒）');
+}
+
+// 保存呼吸设置
+function saveBreathingSettings() {
+    appState.breathingSettings.enabled = document.getElementById('breathingEnabled').checked;
+    
+    // 保存到本地存储
+    localStorage.setItem('zen_breathing_settings', JSON.stringify(appState.breathingSettings));
+    
+    // 更新动画时间
+    updateBreathingAnimationTiming();
+    
+    closeBreathingSettingsModal();
+    alert('设置已保存');
+}
+
+// 加载呼吸设置
+function loadBreathingSettings() {
+    try {
+        const storedSettings = localStorage.getItem('zen_breathing_settings');
+        if (storedSettings) {
+            const settings = JSON.parse(storedSettings);
+            appState.breathingSettings.enabled = settings.enabled !== undefined ? settings.enabled : true;
+            appState.breathingSettings.inhaleTime = settings.inhaleTime || 4000;
+            appState.breathingSettings.exhaleTime = settings.exhaleTime || 6000;
+        }
+    } catch (error) {
+        console.error('加载呼吸设置失败:', error);
+        // 使用默认设置
+        appState.breathingSettings.enabled = true;
+        appState.breathingSettings.inhaleTime = 4000;
+        appState.breathingSettings.exhaleTime = 6000;
+    }
+    
+    // 初始化动画时间
+    updateBreathingAnimationTiming();
+}
