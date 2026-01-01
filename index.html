@@ -32,6 +32,9 @@
             <section class="contraction-section">
                 <button class="contraction-btn" id="contractionBtn">
                     <span class="contraction-btn-text" id="contractionBtnText">疼了点一下</span>
+                    <!-- 新增呼吸引导元素 -->
+                    <div class="breathing-instruction" id="breathingInstruction">深呼吸</div>
+                    <div class="breathing-counter" id="breathingCounter">4</div>
                 </button>
                 <div class="contraction-status" id="contractionStatus"></div>
             </section>
@@ -39,6 +42,7 @@
             <!-- 功能按钮区域 -->
             <section class="function-buttons">
                 <button class="function-btn" id="historyBtn">历史记录</button>
+                <button class="function-btn" id="breathingSettingsBtn">呼吸设置</button>
             </section>
             
         </main>
@@ -74,6 +78,51 @@
                 <div class="modal-footer alert-footer">
                     <button class="cancel-btn" id="cancelHospitalBtn">取消</button>
                     <button class="confirm-btn" id="confirmHospitalBtn">确认</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 呼吸设置模态框 -->
+        <div class="modal" id="breathingSettingsModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>呼吸辅助设置</h2>
+                    <button class="close-btn" id="closeBreathingSettingsModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="setting-item">
+                        <label>启用呼吸辅助</label>
+                        <input type="checkbox" id="breathingEnabled" checked>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label>吸气时长</label>
+                        <div class="time-control">
+                            <button class="time-btn" id="inhaleDecrease">-</button>
+                            <span class="time-display" id="inhaleTime">4</span>
+                            <span class="time-unit">秒</span>
+                            <button class="time-btn" id="inhaleIncrease">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label>呼气时长</label>
+                        <div class="time-control">
+                            <button class="time-btn" id="exhaleDecrease">-</button>
+                            <span class="time-display" id="exhaleTime">6</span>
+                            <span class="time-unit">秒</span>
+                            <button class="time-btn" id="exhaleIncrease">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-description">
+                        <p>开启后，在宫缩记录期间将自动提供呼吸引导，帮助您放松和减轻疼痛。</p>
+                        <p>建议：吸气时间2-6秒，呼气时间4-10秒。呼气时间通常比吸气时间长。</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="clear-btn" id="resetBreathingSettings">恢复默认</button>
+                    <button class="confirm-btn" id="saveBreathingSettings">保存设置</button>
                 </div>
             </div>
         </div>
